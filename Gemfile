@@ -9,6 +9,8 @@ gem 'puma', '~> 5.0'
 gem 'rails', '~> 6.1.0'
 
 group :development, :test do
+  gem 'factory_bot_rails'
+  gem 'faker'
   gem 'pry'
 end
 
