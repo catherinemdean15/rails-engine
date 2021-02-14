@@ -57,4 +57,26 @@ describe 'Items API' do
     items = response.body
     expect(items).to include(item.to_json)
   end
+
+  it 'can get one item by its id' do
+    merchant1 = create(:merchant)
+    id = create(:item, merchant_id: merchant1.id).id
+    get api_v1_item_path(id)
+
+    item = JSON.parse(response.body, symbolize_names: true)
+
+    expect(response).to be_successful
+
+    expect(item).to have_key(:id)
+    expect(item[:id]).to eq(id)
+
+    expect(item).to have_key(:name)
+    expect(item[:name]).to be_a(String)
+
+    expect(item).to have_key(:description)
+    expect(item[:description]).to be_a(String)
+
+    expect(item).to have_key(:unit_price)
+    expect(item[:unit_price]).to be_a(Float)
+  end
 end
