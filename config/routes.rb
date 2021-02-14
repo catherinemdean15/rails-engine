@@ -4,7 +4,9 @@ Rails.application.routes.draw do
       resources :merchants, only: %i[index show] do
         get '/items', to: 'merchants#items'
       end
-      resources :items
+      resources :items do
+        get '/merchant', to: 'items#merchant'
+      end
     end
   end
 end
