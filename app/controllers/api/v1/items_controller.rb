@@ -1,6 +1,9 @@
 class Api::V1::ItemsController < ApplicationController
   def index
-    merchant = Merchant.find(params[:merchant_id])
-    render json: merchant.items
+    page_size = params[:per_page].to_i || 20
+    page_number = params[:page].to_i || 1
+    low_index = ((page_number - 1) * page_size)
+    high_index = (page_number * page_size) - 1
+    render json: Item.all[low_index..high_index]
   end
 end
