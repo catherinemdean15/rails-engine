@@ -6,4 +6,8 @@ class Api::V1::ItemsController < ApplicationController
     high_index = (page_number * page_size) - 1
     render json: Item.all[low_index..high_index]
   end
+
+  def show
+    render json: Item.find(params[:id])
+  end
 end
