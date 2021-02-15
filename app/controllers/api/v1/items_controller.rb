@@ -1,10 +1,6 @@
 class Api::V1::ItemsController < ApplicationController
   def index
-    page_size = params[:per_page].to_i || 20
-    page_number = params[:page].to_i || 1
-    low_index = ((page_number - 1) * page_size)
-    high_index = (page_number * page_size) - 1
-    render json: Item.all[low_index..high_index]
+    paginate(params[:per_page], params[:page], Item)
   end
 
   def show
@@ -12,7 +8,15 @@ class Api::V1::ItemsController < ApplicationController
   end
 
   def create
-    render json: Item.create!(item_params)
+    item = Item.new(item_params)
+    if item.save
+      render json: Item.create!(item_params)
+    else
+      render json: {
+        error: 'Item not created',
+        status: 400
+      }, status: 400
+    end
   end
 
   def update
