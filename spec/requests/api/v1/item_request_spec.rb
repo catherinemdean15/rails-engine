@@ -92,7 +92,6 @@ describe 'Items API' do
 
     post '/api/v1/items', headers: headers, params: JSON.generate(item: item_params)
     created_item = Item.last
-
     expect(response).to be_successful
     expect(created_item.name).to eq(item_params[:name])
     expect(created_item.description).to eq(item_params[:description])
