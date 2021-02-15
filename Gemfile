@@ -7,9 +7,15 @@ gem 'bootsnap', '>= 1.4.4', require: false
 gem 'pg'
 gem 'puma', '~> 5.0'
 gem 'rails', '~> 6.1.0'
+gem 'fast_jsonapi'
 
 group :development, :test do
   gem 'factory_bot_rails'
+  gem 'capybara'
+  gem 'launchy'
+  gem 'rspec-rails'
+  gem 'shoulda-matchers'
+  gem 'simplecov'
   gem 'faker'
   gem 'pry'
 end
@@ -17,14 +23,6 @@ end
 group :development do
   gem 'listen', '~> 3.3'
   gem 'spring'
-end
-
-group :test do
-  gem 'capybara'
-  gem 'launchy'
-  gem 'rspec-rails'
-  gem 'shoulda-matchers'
-  gem 'simplecov'
 end
 
 gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
