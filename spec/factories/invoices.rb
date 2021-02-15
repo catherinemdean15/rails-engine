@@ -2,6 +2,6 @@ FactoryBot.define do
   factory :invoice do
     customer
     merchant
-    status { [0, 1].sample }
+    status { ["processing", "shipped", "cancelled"].sample }
   end
 end

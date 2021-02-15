@@ -1,6 +1,7 @@
 Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
+      get 'merchants/most_items', to: 'merchants#most_items'
       resources :merchants, only: %i[index show] do
         get '/items', to: 'merchants#items'
         get '/merchants_items', to: 'merchants#merchants_items'
@@ -8,7 +9,6 @@ Rails.application.routes.draw do
       resources :items do
         get '/merchant', to: 'items#merchant'
       end
-      get '/most_items', to: 'merchants#most_items'
     end
   end
 end

@@ -6,9 +6,7 @@ describe 'Merchants API' do
 
     get api_v1_merchants_path
     expect(response).to be_successful
-
     merchants = JSON.parse(response.body, symbolize_names: true)[:data]
-
     expect(merchants.count).to eq(3)
 
     merchants.each do |merchant|
@@ -33,11 +31,6 @@ describe 'Merchants API' do
     expect(merchant_response[:data][:attributes][:name]).to eq(merchant.name)
   end
 
-  xit 'fails with 404 if merchant does not exist' do
-    get api_v1_merchant_path(999_999)
-    expect(response.status).to eq(404)
-  end
-
   it "can get a merchant's items" do
     id = create(:merchant).id
     id_2 = create(:merchant).id
@@ -47,7 +40,6 @@ describe 'Merchants API' do
     get api_v1_merchant_items_path(id)
 
     items = JSON.parse(response.body, symbolize_names: true)[:data]
-
     expect(response).to be_successful
     expect(items.count).to eq(10)
 
@@ -73,7 +65,7 @@ describe 'Merchants API' do
 
     get api_v1_merchant_items_path(merchant)
 
-    items = JSON.parse(response.body, symbolize_names: true)
+    items = JSON.parse(response.body, symbolize_names: true)[:data]
 
     expect(response).to be_successful
     expect(items.count).to eq(0)
@@ -86,7 +78,7 @@ describe 'Merchants API' do
     get api_v1_merchants_path({ per_page: 5 })
 
     expect(response).to be_successful
-    merchants = JSON.parse(response.body, symbolize_names: true)
+    merchants = JSON.parse(response.body, symbolize_names: true)[:data]
 
     expect(merchants.count).to eq(5)
   end
@@ -99,7 +91,9 @@ describe 'Merchants API' do
 
     expect(response).to be_successful
     merchants = response.body
-    expect(merchants).to include(merchant.to_json)
+
+    expect(merchants).to include("#{merchant.id}")
+    expect(merchants).to include(merchant.name)
   end
 
   it 'returns an array even if the page has no data' do
@@ -107,7 +101,7 @@ describe 'Merchants API' do
 
     get api_v1_merchants_path({ per_page: 5, page: 7 })
 
-    merchants = JSON.parse(response.body, symbolize_names: true)
+    merchants = JSON.parse(response.body, symbolize_names: true)[:data]
 
     expect(response).to be_successful
     expect(merchants.count).to eq(0)
@@ -127,7 +121,7 @@ describe 'Merchants API' do
     merchant_and_items = JSON.parse(response.body, symbolize_names: true)
     expect(merchant_and_items.count).to eq(2)
     expect(merchant_and_items[:merchant_name]).to eq(merchant1.name)
-    expect(merchant_and_items[:items].first[:name]).to eq(item.name)
+    expect(merchant_and_items[:items][:data].first[:attributes][:name]).to eq(item.name)
   end
 
   it 'retuns an amount of merchants ranked by total number of items sold' do
@@ -159,11 +153,10 @@ describe 'Merchants API' do
     (create :invoice_item, item_id: items4[1].id, invoice_id: invoice4.id, quantity: 2, unit_price: 9.19)
     get api_v1_merchants_most_items_path({ quantity: 3})
     expect(response).to be_successful
-    merchants_by_sales = JSON.parse(response.body, symbolize_names: true)
-    require "pry"; binding.pry
+    merchants_by_sales = JSON.parse(response.body, symbolize_names: true)[:data]
     expect(merchants_by_sales.count).to eq(3)
     expect(merchants_by_sales[0][:name]).to eq(merchant3.name)
-    expect(merchants_by_sales[1][:name]).to eq(merchant1.name)
-    expect(merchants_by_sales[2][:name]).to eq(merchant4.name)
+    expect(merchants_by_sales[1][:name]).to eq(merchant4.name)
+    expect(merchants_by_sales[2][:name]).to eq(merchant1.name)
   end
 end
