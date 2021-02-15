@@ -7,33 +7,30 @@ describe 'Merchants API' do
     get api_v1_merchants_path
     expect(response).to be_successful
 
-    merchants = JSON.parse(response.body, symbolize_names: true)
+    merchants = JSON.parse(response.body, symbolize_names: true)[:data]
 
     expect(merchants.count).to eq(3)
 
     merchants.each do |merchant|
       expect(merchant).to have_key(:id)
-      expect(merchant[:id]).to be_an(Integer)
 
-      expect(merchant).to have_key(:name)
-      expect(merchant[:name]).to be_a(String)
+      expect(merchant[:attributes]).to have_key(:name)
+      expect(merchant[:attributes][:name]).to be_a(String)
     end
   end
 
   it 'can get one merchant by its id' do
-    id = create(:merchant).id
+    merchant = create(:merchant)
 
-    get api_v1_merchant_path(id)
+    get api_v1_merchant_path(merchant)
 
-    merchant = JSON.parse(response.body, symbolize_names: true)
-
+    merchant_response = JSON.parse(response.body, symbolize_names: true)
     expect(response).to be_successful
+    expect(merchant_response[:data]).to have_key(:id)
+    expect(merchant_response[:data][:id].to_i).to eq(merchant.id)
 
-    expect(merchant).to have_key(:id)
-    expect(merchant[:id]).to eq(id)
-
-    expect(merchant).to have_key(:name)
-    expect(merchant[:name]).to be_a(String)
+    expect(merchant_response[:data][:attributes]).to have_key(:name)
+    expect(merchant_response[:data][:attributes][:name]).to eq(merchant.name)
   end
 
   xit 'fails with 404 if merchant does not exist' do
@@ -49,26 +46,25 @@ describe 'Merchants API' do
 
     get api_v1_merchant_items_path(id)
 
-    items = JSON.parse(response.body, symbolize_names: true)
+    items = JSON.parse(response.body, symbolize_names: true)[:data]
 
     expect(response).to be_successful
     expect(items.count).to eq(10)
 
     items.each do |item|
       expect(item).to have_key(:id)
-      expect(item[:id]).to be_a(Integer)
 
-      expect(item).to have_key(:name)
-      expect(item[:name]).to be_a(String)
+      expect(item[:attributes]).to have_key(:name)
+      expect(item[:attributes][:name]).to be_a(String)
 
-      expect(item).to have_key(:description)
-      expect(item[:description]).to be_a(String)
+      expect(item[:attributes]).to have_key(:description)
+      expect(item[:attributes][:description]).to be_a(String)
 
-      expect(item).to have_key(:unit_price)
-      expect(item[:unit_price]).to be_a(Float)
+      expect(item[:attributes]).to have_key(:unit_price)
+      expect(item[:attributes][:unit_price]).to be_a(Float)
 
-      expect(item).to have_key(:merchant_id)
-      expect(item[:merchant_id]).to eq(id)
+      expect(item[:attributes]).to have_key(:merchant_id)
+      expect(item[:attributes][:merchant_id]).to eq(id)
     end
   end
 
@@ -147,10 +143,10 @@ describe 'Merchants API' do
 
     customer = (create :customer)
 
-    invoice1 = (create :invoice, customer_id: customer.id, merchant_id: merchant1.id, status: 1)
-    invoice2 = (create :invoice, customer_id: customer.id, merchant_id: merchant1.id, status: 0)
-    invoice3 = (create :invoice, customer_id: customer.id, merchant_id: merchant3.id, status: 1)
-    invoice4 = (create :invoice, customer_id: customer.id, merchant_id: merchant4.id, status: 1)
+    invoice1 = (create :invoice, customer_id: customer.id, merchant_id: merchant1.id, status: "shipped")
+    invoice2 = (create :invoice, customer_id: customer.id, merchant_id: merchant1.id, status: "canceled")
+    invoice3 = (create :invoice, customer_id: customer.id, merchant_id: merchant3.id, status: "shipped")
+    invoice4 = (create :invoice, customer_id: customer.id, merchant_id: merchant4.id, status: "shipped")
 
     # merchant 1
     (create :invoice_item, item_id: items1.first.id, invoice_id: invoice1.id, quantity: 1, unit_price: 2.19)
@@ -161,10 +157,10 @@ describe 'Merchants API' do
 
     # merchant 4
     (create :invoice_item, item_id: items4[1].id, invoice_id: invoice4.id, quantity: 2, unit_price: 9.19)
-
-    get api_v1_most_items_path({ quantity: 3})
+    get api_v1_merchants_most_items_path({ quantity: 3})
     expect(response).to be_successful
     merchants_by_sales = JSON.parse(response.body, symbolize_names: true)
+    require "pry"; binding.pry
     expect(merchants_by_sales.count).to eq(3)
     expect(merchants_by_sales[0][:name]).to eq(merchant3.name)
     expect(merchants_by_sales[1][:name]).to eq(merchant1.name)
