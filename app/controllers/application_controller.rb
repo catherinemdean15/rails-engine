@@ -14,6 +14,6 @@ class ApplicationController < ActionController::API
     high_index = (page_number * page_size) - 1
     results = []
     results << model.all[low_index..high_index] unless model.all[low_index..high_index].nil?
-    render json: results.flatten
+    results.flatten
   end
 end
