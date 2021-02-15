@@ -10,12 +10,10 @@ class Api::V1::ItemsController < ApplicationController
   def create
     item = Item.new(item_params)
     if item.save
-      render json: Item.create!(item_params)
+      render json: item
     else
-      render json: {
-        error: 'Item not created',
-        status: 400
-      }, status: 400
+      render json: { error: 'Item not created',
+                     status: 400 }, status: 400
     end
   end
 
