@@ -1,10 +1,6 @@
 class Api::V1::MerchantsController < ApplicationController
   def index
-    page_size = params[:per_page].to_i || 20
-    page_number = params[:page].to_i || 1
-    low_index = ((page_number - 1) * page_size)
-    high_index = (page_number * page_size) - 1
-    render json: Merchant.all[low_index..high_index]
+    paginate(params[:per_page], params[:page], Merchant)
   end
 
   def show
@@ -14,5 +10,15 @@ class Api::V1::MerchantsController < ApplicationController
   def items
     merchant = Merchant.find(params[:merchant_id])
     render json: merchant.items
+  end
+
+  def merchants_items
+    merchant = Merchant.find(params[:merchant_id])
+    render json: { merchant_name: merchant.name,
+                   items: merchant.items }
+  end
+
+  def most_items
+    render json: Merchant.most_items(params[:quantity])
   end
 end
