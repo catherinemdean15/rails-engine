@@ -28,4 +28,9 @@ class Api::V1::MerchantsController < ApplicationController
     merchant = Merchant.partial_match(params[:name], "name").first if params[:name]
     render json: MerchantSerializer.new(merchant)
   end
+
+  def find_all
+    merchants = Merchant.partial_match(params[:name], "name") if params[:name]
+    render json: MerchantSerializer.new(merchants)
+  end
 end
