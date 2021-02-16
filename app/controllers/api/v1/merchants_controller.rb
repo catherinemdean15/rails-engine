@@ -23,4 +23,9 @@ class Api::V1::MerchantsController < ApplicationController
   def most_items
     render json: {data: Merchant.most_items(params[:quantity])}
   end
+
+  def find_one
+    merchant = Merchant.partial_match(params[:name], "name").first if params[:name]
+    render json: MerchantSerializer.new(merchant)
+  end
 end
