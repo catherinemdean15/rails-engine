@@ -163,11 +163,27 @@ describe 'Merchants API' do
   it "can find one merchant based on search criteria" do
     (create_list :merchant, 20)
     merchant1 = (create :merchant, name: "Candy Store")
+    merchant2 = (create :merchant, name: "Some Candy")
 
 
     get api_v1_merchants_find_path({ name: "candy"})
     matching_merchants = JSON.parse(response.body, symbolize_names: true)
     expect(matching_merchants.count).to eq(1)
     expect(matching_merchants[:data][:attributes][:name]).to eq(merchant1.name)
+  end
+
+  it "can find all merchants based on search criteria" do
+    (create_list :merchant, 3)
+    merchant1 = (create :merchant, name: "Candy Store")
+    merchant2 = (create :merchant, name: "Some Candy")
+    merchant3 = (create :merchant, name: "Candy Candy")
+
+    get api_v1_merchants_find_all_path({ name: "candy"})
+    matching_merchants = JSON.parse(response.body, symbolize_names: true)
+    expect(matching_merchants[:data].count).to eq(3)
+    expect(matching_merchants[:data].first[:attributes][:name]).to eq(merchant1.name)
+    expect(matching_merchants[:data][1][:attributes][:name]).to eq(merchant2.name)
+    expect(matching_merchants[:data][2][:attributes][:name]).to eq(merchant3.name)
+
   end
 end
