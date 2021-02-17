@@ -1,32 +1,41 @@
 class Api::V1::ItemsController < ApplicationController
   def index
-    paginate(params[:per_page], params[:page], Item)
+    render json: ItemSerializer.new(paginate(params[:per_page],
+                                    params[:page],
+                                    Item))
   end
 
   def show
-    render json: Item.find(params[:id])
+    render json: ItemSerializer.new(Item.find(params[:id]))
   end
 
   def create
-    item = Item.new(item_params)
-    if item.save
-      render json: item
-    else
-      render json: { error: 'Item not created',
-                     status: 400 }, status: 400
-    end
+    item = Item.create!(item_params)
+    render json: ItemSerializer.new(item), status: :created
   end
 
   def update
-    render json: Item.update(params[:id], item_params)
+    item = Item.find(params[:id])
+    item.update!(item_params)
+    render json: ItemSerializer.new(item)
   end
 
   def destroy
-    render json: Item.delete(params[:id])
+    Item.delete(params[:id])
   end
 
   def merchant
-    render json: Item.find(params[:item_id]).merchant
+    render json: MerchantSerializer.new(Item.find(params[:item_id]).merchant)
+  end
+
+  def find_one
+    item = Item.partial_match(params[:name], "name").first if params[:name]
+    render json: ItemSerializer.new(item)
+  end
+
+  def find_all
+    items = Item.partial_match(params[:name], "name") if params[:name]
+    render json: ItemSerializer.new(items)
   end
 
   private

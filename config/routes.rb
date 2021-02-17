@@ -8,6 +8,8 @@ Rails.application.routes.draw do
         get '/items', to: 'merchants#items'
         get '/merchants_items', to: 'merchants#merchants_items'
       end
+      get 'items/find_all', to: 'items#find_all'
+      get 'items/find', to: 'items#find_one'
       resources :items do
         get '/merchant', to: 'items#merchant'
       end
