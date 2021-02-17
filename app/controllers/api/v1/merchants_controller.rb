@@ -1,18 +1,36 @@
 class Api::V1::MerchantsController < ApplicationController
   def index
-    page_size = params[:per_page].to_i || 20
-    page_number = params[:page].to_i || 1
-    low_index = ((page_number - 1) * page_size)
-    high_index = (page_number * page_size) - 1
-    render json: Merchant.all[low_index..high_index]
+    render json: MerchantSerializer.new(paginate(params[:per_page],
+                                                 params[:page],
+                                                 Merchant))
   end
 
   def show
-    render json: Merchant.find(params[:id])
+    render json: MerchantSerializer.new(Merchant.find(params[:id]))
   end
 
   def items
     merchant = Merchant.find(params[:merchant_id])
-    render json: merchant.items
+    render json: ItemSerializer.new(merchant.items)
+  end
+
+  def merchants_items
+    merchant = Merchant.find(params[:merchant_id])
+    render json: { merchant_name: merchant.name,
+                   items: ItemSerializer.new(merchant.items)}
+  end
+
+  def most_items
+    render json: {data: Merchant.most_items(params[:quantity])}
+  end
+
+  def find_one
+    merchant = Merchant.partial_match(params[:name], "name").first if params[:name]
+    render json: MerchantSerializer.new(merchant)
+  end
+
+  def find_all
+    merchants = Merchant.partial_match(params[:name], "name") if params[:name]
+    render json: MerchantSerializer.new(merchants)
   end
 end
