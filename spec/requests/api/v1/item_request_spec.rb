@@ -11,22 +11,21 @@ describe 'Items API' do
     get api_v1_items_path
     expect(response).to be_successful
 
-    items = JSON.parse(response.body, symbolize_names: true)
+    items = JSON.parse(response.body, symbolize_names: true)[:data]
 
     expect(items.count).to eq(6)
 
     items.each do |item|
       expect(item).to have_key(:id)
-      expect(item[:id]).to be_an(Integer)
 
-      expect(item).to have_key(:name)
-      expect(item[:name]).to be_a(String)
+      expect(item[:attributes]).to have_key(:name)
+      expect(item[:attributes][:name]).to be_a(String)
 
-      expect(item).to have_key(:description)
-      expect(item[:description]).to be_a(String)
+      expect(item[:attributes]).to have_key(:description)
+      expect(item[:attributes][:description]).to be_a(String)
 
-      expect(item).to have_key(:unit_price)
-      expect(item[:unit_price]).to be_a(Float)
+      expect(item[:attributes]).to have_key(:unit_price)
+      expect(item[:attributes][:unit_price]).to be_a(Float)
     end
   end
 
@@ -40,7 +39,7 @@ describe 'Items API' do
     get api_v1_items_path({ per_page: 2 })
 
     expect(response).to be_successful
-    items = JSON.parse(response.body, symbolize_names: true)
+    items = JSON.parse(response.body, symbolize_names: true)[:data]
 
     expect(items.count).to eq(2)
   end
@@ -55,7 +54,10 @@ describe 'Items API' do
 
     expect(response).to be_successful
     items = response.body
-    expect(items).to include(item.to_json)
+
+    expect(items).to include(item.name)
+    expect(items).to include(item.description)
+    expect(items).to include("#{item.id}")
   end
 
   it 'can get one item by its id' do
@@ -63,21 +65,21 @@ describe 'Items API' do
     id = create(:item, merchant_id: merchant1.id).id
     get api_v1_item_path(id)
 
-    item = JSON.parse(response.body, symbolize_names: true)
+    item = JSON.parse(response.body, symbolize_names: true)[:data]
 
     expect(response).to be_successful
 
     expect(item).to have_key(:id)
-    expect(item[:id]).to eq(id)
+    expect(item[:id]).to eq("#{id}")
 
-    expect(item).to have_key(:name)
-    expect(item[:name]).to be_a(String)
+    expect(item[:attributes]).to have_key(:name)
+    expect(item[:attributes][:name]).to be_a(String)
 
-    expect(item).to have_key(:description)
-    expect(item[:description]).to be_a(String)
+    expect(item[:attributes]).to have_key(:description)
+    expect(item[:attributes][:description]).to be_a(String)
 
-    expect(item).to have_key(:unit_price)
-    expect(item[:unit_price]).to be_a(Float)
+    expect(item[:attributes]).to have_key(:unit_price)
+    expect(item[:attributes][:unit_price]).to be_a(Float)
   end
 
   it 'can create an item' do
@@ -97,22 +99,6 @@ describe 'Items API' do
     expect(created_item.description).to eq(item_params[:description])
     expect(created_item.unit_price).to eq(item_params[:unit_price])
     expect(created_item.merchant_id).to eq(item_params[:merchant_id])
-  end
-
-  it 'has a create item sad path' do
-    merchant1 = create(:merchant)
-    item_params = {
-      name: 'New Name',
-      unit_price: 23.89,
-      merchant_id: merchant1.id
-    }
-    headers = { 'CONTENT_TYPE' => 'application/json' }
-
-    post '/api/v1/items', headers: headers, params: JSON.generate(item: item_params)
-    item = JSON.parse(response.body, symbolize_names: true)
-
-    expect(item[:status]).to eq(400)
-    expect(item[:error]).to eq('Item not created')
   end
 
   it 'can destroy an item' do
@@ -149,10 +135,36 @@ describe 'Items API' do
     item = create(:item, merchant_id: merchant1.id)
 
     get "/api/v1/items/#{item.id}/merchant"
-    merchant = JSON.parse(response.body, symbolize_names: true)
-
+    merchant = JSON.parse(response.body, symbolize_names: true)[:data]
     expect(response).to be_successful
-    expect(merchant[:name]).to eq(merchant1.name)
-    expect(merchant[:id]).to eq(merchant1.id)
+    expect(merchant[:attributes][:name]).to eq(merchant1.name)
+    expect(merchant[:id]).to eq("#{merchant1.id}")
+  end
+
+  it "can find one item based on search criteria" do
+    merchant1 = create(:merchant)
+    create_list(:item, 2, merchant_id: merchant1.id)
+    item_1 = create(:item, name: "Cool Item", merchant_id: merchant1.id)
+    item_2 = create(:item, name: "Super Cool Item", merchant_id: merchant1.id)
+
+    get api_v1_items_find_path({ name: "cool"})
+    matching_item = JSON.parse(response.body, symbolize_names: true)
+    expect(matching_item.count).to eq(1)
+    expect(matching_item[:data][:attributes][:name]).to eq(item_1.name)
+  end
+
+  it "can find all items based on search criteria" do
+    merchant1 = create(:merchant)
+    create_list(:item, 5, merchant_id: merchant1.id)
+    item_1 = create(:item, name: "Cool Item", merchant_id: merchant1.id)
+    item_2 = create(:item, name: "Super Cool Item", merchant_id: merchant1.id)
+    item_3 = create(:item, name: "Cool Cool Cool", merchant_id: merchant1.id)
+
+    get api_v1_items_find_all_path({ name: "cool"})
+    matching_items = JSON.parse(response.body, symbolize_names: true)
+    expect(matching_items[:data].count).to eq(3)
+    expect(matching_items[:data].first[:attributes][:name]).to eq(item_1.name)
+    expect(matching_items[:data][1][:attributes][:name]).to eq(item_2.name)
+    expect(matching_items[:data][2][:attributes][:name]).to eq(item_3.name)
   end
 end
