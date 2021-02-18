@@ -9,4 +9,12 @@ class Api::V1::RevenuesController < ApplicationController
       render json: RevenueSerializer.revenue_by_date(revenue)
     end
   end
+
+  def merchant_revenue
+    merchant = Merchant.find(params[:id])
+    revenue = merchant.invoice_items.joins(invoice: :transactions)
+                      .where("invoices.status='shipped' AND transactions.result='success'")
+                      .sum('invoice_items.quantity * invoice_items.unit_price')
+    render json: RevenueSerializer.merchant_revenue(merchant, revenue)
+  end
 end
