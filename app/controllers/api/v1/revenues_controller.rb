@@ -12,23 +12,23 @@ class Api::V1::RevenuesController < ApplicationController
 
   def merchant_revenue
     merchant = Merchant.find(params[:id])
-    revenue = merchant.invoice_items.joins(invoice: :transactions)
-                      .where("invoices.status='shipped' AND transactions.result='success'")
-                      .sum('invoice_items.quantity * invoice_items.unit_price')
+    revenue = merchant.total_revenue
     render json: RevenueSerializer.merchant_revenue(merchant, revenue)
   end
 
   def items_by_revenue
-    if params[:quantity]
-      render json: ItemRevenueSerializer.new(Item.items_by_revenue.limit(params[:quantity]))
+    limit = params[:quantity] || 10
+    if limit.to_i > 0
+      render json: ItemRevenueSerializer.new(Item.items_by_revenue.limit(limit))
     else
       render json: { 'error' => {} }, status: 400
     end
   end
 
   def unshipped_orders
-    if params[:quantity]
-      render json: UnshippedOrderSerializer.new(Invoice.unshipped_orders.limit(params[:quantity]))
+    limit = params[:quantity] || 10
+    if limit.to_i > 0
+      render json: UnshippedOrderSerializer.new(Invoice.unshipped_orders.limit(limit))
     else
       render json: { 'error' => {} }, status: 400
     end
@@ -36,6 +36,5 @@ class Api::V1::RevenuesController < ApplicationController
 
   def weekly
     render json: WeeklyRevenueSerializer.new(Invoice.weekly_revenue)
-    require 'pry'; binding.pry
   end
 end

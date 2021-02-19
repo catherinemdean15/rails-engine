@@ -31,13 +31,21 @@ class Api::V1::ItemsController < ApplicationController
   end
 
   def find_one
-    item = Item.partial_match(params[:name], 'name').first if params[:name]
-    render json: ItemSerializer.new(item)
+    item = Item.partial_match(params[:name], 'name').first
+    if item.present?
+      render json: ItemSerializer.new(item)
+    else
+      render json: { data: {} }
+    end
   end
 
   def find_all
-    items = Item.partial_match(params[:name], 'name') if params[:name]
-    render json: ItemSerializer.new(items)
+    items = Item.partial_match(params[:name], 'name')
+    if items.present?
+      render json: ItemSerializer.new(items)
+    else
+      render json: { data: [] }
+    end
   end
 
   private
