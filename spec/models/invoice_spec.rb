@@ -45,8 +45,9 @@ RSpec.describe Invoice, type: :model do
       expect(Invoice.unshipped_orders).to eq([@invoice2])
     end
 
-    xit 'weekly_revenue' do
-      expect(Invoice.weekly_revenue).to eq([])
+    it 'weekly_revenue' do
+      expect(Invoice.weekly_revenue.first.revenue).to eq(36.00)
+      expect(Invoice.weekly_revenue[1].revenue).to eq(30.00)
     end
   end
 end
