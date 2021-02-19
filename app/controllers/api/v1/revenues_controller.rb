@@ -14,6 +14,14 @@ module Api
         end
       end
 
+      def merchants
+        if params[:quantity].present?
+          render json: MerchantNameRevenueSerializer.new(Merchant.merchants_by_revenue(params[:quantity]))
+        else
+          render json: { 'error' => {} }, status: 400
+        end
+      end
+
       def merchant_revenue
         merchant = Merchant.find(params[:id])
         revenue = merchant.total_revenue

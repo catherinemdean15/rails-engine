@@ -35,6 +35,17 @@ describe 'Revenue API' do
     (create :transaction, invoice_id: invoice5.id, result: 'rejected')
   end
 
+  it 'finds merchants by descending total revenue' do
+    get api_v1_revenue_merchants_path({ quantity: 1 })
+    merchant = JSON.parse(response.body, symbolize_names: true)[:data].first
+    expect(merchant[:attributes][:name]).to eq(@merchant2.name)
+  end
+
+  it 'has sad path for finding merchants descending by revenue' do
+    get api_v1_revenue_merchants_path({ quantity: nil })
+    expect(response.status).to eq(400)
+  end
+
   it 'provides a total revenue from a date range' do
     get api_v1_revenue_path({ start: '2020-03-20', end: '2020-04-01' })
 
