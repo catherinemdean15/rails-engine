@@ -69,17 +69,12 @@ describe 'Revenue API' do
     expect(total_revenue[:id]).to eq(@merchant2.id.to_s)
   end
 
-  it 'errors to find the items by revenue without a quantity' do
-    get api_v1_revenue_items_path
-    expect(response.status).to eq(400)
-  end
-
   it 'finds the items ranked by descending revenue with a quantity' do
     get api_v1_revenue_items_path({ quantity: 2 })
     items_by_revenue = JSON.parse(response.body, symbolize_names: true)[:data]
     expect(items_by_revenue.count).to eq(2)
-    expect(items_by_revenue.first[:attributes][:name]).to eq(@items2[1].name)
-    expect(items_by_revenue[1][:attributes][:name]).to eq(@items2[0].name)
+    expect(items_by_revenue.first[:attributes][:name]).to eq(@items1[1].name)
+    expect(items_by_revenue[1][:attributes][:name]).to eq(@items2[1].name)
   end
 
   it 'errors to find the items with a negative quantity' do
@@ -100,33 +95,27 @@ describe 'Revenue API' do
   end
 
   it 'errors to find the unshipped items with a negative quantity' do
-    get api_v1_revenue_items_path({ quantity: -3 })
+    get api_v1_revenue_unshipped_path({ quantity: -3 })
     expect(response.status).to eq(400)
   end
 
   it 'errors to find the unshipped items with a quantity of characters' do
-    get api_v1_revenue_items_path({ quantity: 'hi' })
+    get api_v1_revenue_unshipped_path({ quantity: 'hi' })
     expect(response.status).to eq(400)
   end
 
-  it 'errors to find the unshipped items with no params' do
-    get api_v1_revenue_items_path({ quantity: nil })
-    expect(response.status).to eq(400)
-  end
-
-  xit 'lists the revenue by week' do
+  it 'lists the revenue by week' do
     get api_v1_revenue_weekly_path
     weekly_revenue = JSON.parse(response.body, symbolize_names: true)[:data]
-    expect(weekly_revenue.count).to eq(1)
+    expect(weekly_revenue.count).to eq(2)
     weekly_revenue.each do |week|
       expect(week).to have_key(:attributes)
 
-      expect(week[:attrubutes]).to have_key(:week)
-      expect(week[:attrubutes][:week]).to be_a(String)
+      expect(week[:attributes]).to have_key(:week)
+      expect(week[:attributes][:week]).to be_a(String)
 
-      expect(week[:attrubutes]).to have_key(:revenue)
-      expect(week[:attrubutes][:revenue]).to be_an(Integer)
+      expect(week[:attributes]).to have_key(:revenue)
     end
-    expect(weekly_revenue.first[:attributes][:revenue]).to eq(50.00)
+    expect(weekly_revenue.first[:attributes][:revenue]).to eq(36.00)
   end
 end
