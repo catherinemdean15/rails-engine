@@ -78,6 +78,8 @@ describe 'Revenue API' do
     get api_v1_revenue_items_path({ quantity: 2 })
     items_by_revenue = JSON.parse(response.body, symbolize_names: true)[:data]
     expect(items_by_revenue.count).to eq(2)
+    expect(items_by_revenue.first[:attributes][:name]).to eq(@items2[1].name)
+    expect(items_by_revenue[1][:attributes][:name]).to eq(@items2[0].name)
   end
 
   it 'errors to find the items with a negative quantity' do
