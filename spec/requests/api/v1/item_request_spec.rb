@@ -158,13 +158,13 @@ describe 'Items API' do
   it 'can find one item based on search criteria' do
     merchant1 = create(:merchant)
     create_list(:item, 2, merchant_id: merchant1.id)
-    item_1 = create(:item, name: 'Cool Item', merchant_id: merchant1.id)
-    item_2 = create(:item, name: 'Super Cool Item', merchant_id: merchant1.id)
+    item1 = create(:item, name: 'Cool Item', merchant_id: merchant1.id)
+    create(:item, name: 'Super Cool Item', merchant_id: merchant1.id)
 
     get api_v1_items_find_path({ name: 'cool' })
     matching_item = JSON.parse(response.body, symbolize_names: true)
     expect(matching_item.count).to eq(1)
-    expect(matching_item[:data][:attributes][:name]).to eq(item_1.name)
+    expect(matching_item[:data][:attributes][:name]).to eq(item1.name)
   end
 
   it 'has a sad path for find one item' do
@@ -179,16 +179,16 @@ describe 'Items API' do
   it 'can find all items based on search criteria' do
     merchant1 = create(:merchant)
     create_list(:item, 5, merchant_id: merchant1.id)
-    item_1 = create(:item, name: 'Cool Item', merchant_id: merchant1.id)
-    item_2 = create(:item, name: 'Super Cool Item', merchant_id: merchant1.id)
-    item_3 = create(:item, name: 'Cool Cool Cool', merchant_id: merchant1.id)
+    item1 = create(:item, name: 'Cool Item', merchant_id: merchant1.id)
+    item2 = create(:item, name: 'Super Cool Item', merchant_id: merchant1.id)
+    item3 = create(:item, name: 'Cool Cool Cool', merchant_id: merchant1.id)
 
     get api_v1_items_find_all_path({ name: 'cool' })
     matching_items = JSON.parse(response.body, symbolize_names: true)
     expect(matching_items[:data].count).to eq(3)
-    expect(matching_items[:data].first[:attributes][:name]).to eq(item_1.name)
-    expect(matching_items[:data][1][:attributes][:name]).to eq(item_2.name)
-    expect(matching_items[:data][2][:attributes][:name]).to eq(item_3.name)
+    expect(matching_items[:data].first[:attributes][:name]).to eq(item1.name)
+    expect(matching_items[:data][1][:attributes][:name]).to eq(item2.name)
+    expect(matching_items[:data][2][:attributes][:name]).to eq(item3.name)
   end
 
   it 'has a sad path for finding all items based on search criteria' do
