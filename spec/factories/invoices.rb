@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :invoice do
     customer
     merchant
-    status { ["processing", "shipped", "cancelled"].sample }
+    status { %w[processing shipped cancelled].sample }
   end
 end
