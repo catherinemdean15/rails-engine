@@ -1,11 +1,9 @@
 require 'rails_helper'
 
-RSpec.describe Invoice, type: :model do
+RSpec.describe InvoiceItem, type: :model do
   describe 'relationships' do
-    it { should belong_to :customer }
-    it { should belong_to :merchant }
-    it { should have_many(:invoice_items) }
-    it { should have_many(:transactions) }
+    it { should belong_to :item }
+    it { should belong_to :invoice }
   end
 
   describe 'class methods' do
@@ -41,12 +39,8 @@ RSpec.describe Invoice, type: :model do
       (create :transaction, invoice_id: @invoice5.id, result: 'rejected')
     end
 
-    it 'unshipped_orders' do
-      expect(Invoice.unshipped_orders).to eq([@invoice2])
-    end
-
-    xit 'weekly_revenue' do
-      expect(Invoice.weekly_revenue).to eq([])
+    it 'revenue_by_date' do
+      expect(InvoiceItem.revenue_by_date('2020-03-24', '2020-04-01')).to eq(36.00)
     end
   end
 end
