@@ -17,20 +17,32 @@ class Api::V1::MerchantsController < ApplicationController
   def merchants_items
     merchant = Merchant.find(params[:merchant_id])
     render json: { merchant_name: merchant.name,
-                   items: ItemSerializer.new(merchant.items)}
+                   items: ItemSerializer.new(merchant.items) }
   end
 
   def most_items
-    render json: {data: Merchant.most_items(params[:quantity])}
+    if params[:quantity].nil?
+      render json: { 'error' => {} }, status: 400
+    else
+      render json: MerchantItemsSoldSerializer.new(Merchant.most_items(params[:quantity]))
+    end
   end
 
   def find_one
-    merchant = Merchant.partial_match(params[:name], "name").first if params[:name]
-    render json: MerchantSerializer.new(merchant)
+    merchant = Merchant.partial_match(params[:name], 'name')
+    if merchant.present?
+      render json: MerchantSerializer.new(merchant.first)
+    else
+      render json: { data: {} }
+    end
   end
 
   def find_all
-    merchants = Merchant.partial_match(params[:name], "name") if params[:name]
-    render json: MerchantSerializer.new(merchants)
+    merchants = Merchant.partial_match(params[:name], 'name')
+    if merchants.present?
+      render json: MerchantSerializer.new(merchants)
+    else
+      render json: { data: [] }
+    end
   end
 end

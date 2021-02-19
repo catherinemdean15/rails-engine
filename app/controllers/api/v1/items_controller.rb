@@ -1,8 +1,8 @@
 class Api::V1::ItemsController < ApplicationController
   def index
     render json: ItemSerializer.new(paginate(params[:per_page],
-                                    params[:page],
-                                    Item))
+                                             params[:page],
+                                             Item))
   end
 
   def show
@@ -18,6 +18,8 @@ class Api::V1::ItemsController < ApplicationController
     item = Item.find(params[:id])
     item.update!(item_params)
     render json: ItemSerializer.new(item)
+  rescue StandardError
+    render json: { 'error' => {} }, status: 404
   end
 
   def destroy
@@ -29,12 +31,12 @@ class Api::V1::ItemsController < ApplicationController
   end
 
   def find_one
-    item = Item.partial_match(params[:name], "name").first if params[:name]
+    item = Item.partial_match(params[:name], 'name').first if params[:name]
     render json: ItemSerializer.new(item)
   end
 
   def find_all
-    items = Item.partial_match(params[:name], "name") if params[:name]
+    items = Item.partial_match(params[:name], 'name') if params[:name]
     render json: ItemSerializer.new(items)
   end
 
