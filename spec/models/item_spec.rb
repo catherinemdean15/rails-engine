@@ -47,7 +47,10 @@ RSpec.describe Item, type: :model do
     end
 
     it 'items_by_revenue' do
-      expect(Item.items_by_revenue).to eq([@items2[1], @items2[0], @items1[0]])
+      expect(Item.items_by_revenue[0]).to eq(@items1[1])
+      expect(Item.items_by_revenue[1]).to eq(@items2[1])
+      expect(Item.items_by_revenue[2]).to eq(@items2[0])
+      expect(Item.items_by_revenue[3]).to eq(@items1[0])
     end
   end
 end

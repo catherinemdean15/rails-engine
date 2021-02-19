@@ -8,8 +8,8 @@ class Item < ApplicationRecord
 
   def self.items_by_revenue
     joins(invoices: :transactions)
-      .where("invoices.status='shipped' AND transactions.result='success'")
-      .select('items.*, sum(quantity * invoice_items.unit_price) AS revenue')
+      .where("transactions.result='success'")
+      .select('items.*, sum(invoice_items.quantity * invoice_items.unit_price) AS revenue')
       .group(:id)
       .order('revenue DESC')
   end
