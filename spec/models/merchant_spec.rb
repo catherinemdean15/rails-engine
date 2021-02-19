@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe Merchant do
   describe 'validations' do
-  it { should validate_presence_of :name }
+    it { should validate_presence_of :name }
   end
   describe 'relationships' do
     it { should have_many :invoices }
@@ -10,10 +10,10 @@ describe Merchant do
   end
   describe 'class methods' do
     it 'most items' do
-      merchant1 = (create :merchant)
-      merchant2 = (create :merchant)
-      merchant3 = (create :merchant)
-      merchant4 = (create :merchant)
+      merchant1 = create(:merchant)
+      merchant2 = create(:merchant)
+      merchant3 = create(:merchant)
+      merchant4 = create(:merchant)
 
       items1 = (create_list :item, 2, merchant_id: merchant1.id)
       items2 = (create_list :item, 2, merchant_id: merchant2.id)
@@ -22,10 +22,15 @@ describe Merchant do
 
       customer = (create :customer)
 
-      invoice1 = (create :invoice, customer_id: customer.id, merchant_id: merchant1.id, status: 1)
-      invoice2 = (create :invoice, customer_id: customer.id, merchant_id: merchant1.id, status: 0)
-      invoice3 = (create :invoice, customer_id: customer.id, merchant_id: merchant3.id, status: 1)
-      invoice4 = (create :invoice, customer_id: customer.id, merchant_id: merchant4.id, status: 1)
+      invoice1 = (create :invoice, customer_id: customer.id, merchant_id: merchant1.id, status: 'shipped')
+      invoice2 = (create :invoice, customer_id: customer.id, merchant_id: merchant1.id, status: 'canceled')
+      invoice3 = (create :invoice, customer_id: customer.id, merchant_id: merchant3.id, status: 'shipped')
+      invoice4 = (create :invoice, customer_id: customer.id, merchant_id: merchant4.id, status: 'shipped')
+
+      (create :transaction, invoice_id: invoice1.id, result: 'success')
+      (create :transaction, invoice_id: invoice2.id, result: 'success')
+      (create :transaction, invoice_id: invoice3.id, result: 'success')
+      (create :transaction, invoice_id: invoice4.id, result: 'success')
 
       (create :invoice_item, item_id: items1.first.id, invoice_id: invoice1.id, quantity: 1, unit_price: 2.19)
       (create :invoice_item, item_id: items1[1].id, invoice_id: invoice2.id, quantity: 14, unit_price: 19.99)
@@ -37,6 +42,5 @@ describe Merchant do
       end
       expect(expected).to eq([merchant3.name, merchant1.name, merchant4.name])
     end
-
   end
 end
