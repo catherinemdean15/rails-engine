@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class UnshippedOrderSerializer
+class MerchantNameRevenueSerializer
   include FastJsonapi::ObjectSerializer
-  attributes :potential_revenue
+  attributes :name, :revenue
 end

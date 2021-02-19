@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ApplicationController < ActionController::API
   def paginate(per_page, page, model)
     page_size = if !per_page.nil?

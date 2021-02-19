@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 describe 'Merchants API' do
@@ -33,9 +35,9 @@ describe 'Merchants API' do
 
   it "can get a merchant's items" do
     id = create(:merchant).id
-    id_2 = create(:merchant).id
+    id2 = create(:merchant).id
     create_list(:item, 10, merchant_id: id)
-    create_list(:item, 5, merchant_id: id_2)
+    create_list(:item, 5, merchant_id: id2)
 
     get api_v1_merchant_items_path(id)
 
@@ -130,7 +132,7 @@ describe 'Merchants API' do
     merchant4 = create(:merchant)
 
     items1 = (create_list :item, 2, merchant_id: merchant1.id)
-    items2 = (create_list :item, 2, merchant_id: merchant2.id)
+    (create_list :item, 2, merchant_id: merchant2.id)
     items3 = (create_list :item, 2, merchant_id: merchant3.id)
     items4 = (create_list :item, 2, merchant_id: merchant4.id)
 
@@ -168,7 +170,7 @@ describe 'Merchants API' do
     merchant4 = create(:merchant)
 
     items1 = (create_list :item, 2, merchant_id: merchant1.id)
-    items2 = (create_list :item, 2, merchant_id: merchant2.id)
+    (create_list :item, 2, merchant_id: merchant2.id)
     items3 = (create_list :item, 2, merchant_id: merchant3.id)
     items4 = (create_list :item, 2, merchant_id: merchant4.id)
 

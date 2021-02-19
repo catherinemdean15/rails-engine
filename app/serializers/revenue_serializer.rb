@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class RevenueSerializer
   class << self
     def revenue_by_date(revenue)

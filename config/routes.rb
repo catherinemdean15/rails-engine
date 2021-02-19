@@ -1,7 +1,10 @@
+# frozen_string_literal: true
+
 Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       get 'revenue', to: 'revenues#date_range'
+      get 'revenue/merchants', to: 'revenues#merchants'
       get 'revenue/merchants/:id', to: 'revenues#merchant_revenue'
       get 'revenue/items', to: 'revenues#items_by_revenue'
       get 'revenue/unshipped', to: 'revenues#unshipped_orders'
